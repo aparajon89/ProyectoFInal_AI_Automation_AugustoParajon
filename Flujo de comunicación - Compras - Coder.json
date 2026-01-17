@@ -1,0 +1,5049 @@
+{
+  "name": "Flujo de comunicación - Compras - Coder",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg",
+          "mode": "list",
+          "cachedResultName": "Control de Recepción de Compras",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1359208426,
+          "mode": "list",
+          "cachedResultName": "2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit#gid=1359208426"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        272
+      ],
+      "id": "03c08850-8a08-4128-8a35-9424a6294d59",
+      "name": "Get row(s) in sheet",
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\n\n// 1) Filtramos filas válidas según la lógica basada en columnas remito/proveedor\nconst validBaseRows = rows.filter(item => {\n  const row = item.json;\n\n  const remito = row[\"Nº de Remito del  Proveedor\"];\n  const proveedor = row[\"Proveedor\"];\n\n  const remitoEmpty = !remito || remito.toString().trim() === \"\";\n  const proveedorEmpty = !proveedor || proveedor.toString().trim() === \"\";\n\n  return !(remitoEmpty && proveedorEmpty);\n});\n\n// 2) Filtramos filas que pertenecen a la rama de errores de ingresos\nconst filtered = validBaseRows.filter(item => {\n  const r = item.json;\n\n  const comprador = r[\"Responsable de Compra\"];\n  const oc = r[\"Orden de Compra\"];\n  const fechaInforme = r[\"Fecha de Informe\"];\n\n  // Caso C1: sin comprador\n  if (!comprador || comprador.toString().trim() === \"\") return false;\n\n  // Caso C3: tiene informe pero falta OC\n  if (fechaInforme && (!oc || oc.toString().trim() === \"\")) return false;\n\n  return true;\n});\n\n// 3) Normalizamos y devolvemos\nreturn filtered.map(item => {\n  const row = item.json;\n\n  return {\n    rowNumber: row.row_number || null,\n    numeroInterno: row[\"Nº\"] || null,\n\n    remito: row[\"Nº de Remito del  Proveedor\"] || null,\n    proveedor: row[\"Proveedor\"] || null,\n    descripcion: row[\"Articulos\"] || null,\n    cantidad: row[\"Cantidad\"] || null,\n\n    oc: row[\"Orden de Compra\"] || null,\n    comprador: row[\"Responsable de Compra\"] || null,\n    factura: row[\"Factura\"] || null,\n    vencFactura: row[\"Vencimiento FC\"] || null,\n\n    guia: row[\"Nº de Guia\"] || null,\n    fechaRemito: row[\"Fecha de remito\"] || null,\n    fechaDeposito: row[\"Fecha de recepción \\n(Deposito Bs As)\"] || null,\n    fechaCol: row[\"Fecha de Recepción (Col)\"] || null,\n\n    fechaInforme: row[\"Fecha de Informe\"] || null,\n    nroInforme: row[\"Nº de informe \"] || null,\n    observaciones: row[\"Observaciones\"] || null,\n\n    flagMail2: row[\"FLAG_MAIL2_Enviado\"] || null,\n    linkDrive: row[\"Link - Drive\"] || null\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        272
+      ],
+      "id": "576919c9-d146-4360-92d8-06f4e64facf5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg",
+          "mode": "list",
+          "cachedResultName": "Control de Recepción de Compras",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1359208426,
+          "mode": "list",
+          "cachedResultName": "2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit#gid=1359208426"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        -544
+      ],
+      "id": "4d3b5baa-467a-4450-af52-47cf4bc3c423",
+      "name": "Get row(s) in sheet1",
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\n\n// 1) Filtramos filas válidas: deben tener al menos remito o proveedor\nconst filtered = rows.filter(item => {\nconst row = item.json;\n\nconst remito = row[\"Nº de Remito del Proveedor\"];\nconst proveedor = row[\"Proveedor\"];\n\nconst remitoEmpty = !remito || remito.toString().trim() === \"\";\nconst proveedorEmpty = !proveedor || proveedor.toString().trim() === \"\";\n\n// descartamos solo si NO hay remito Y NO hay proveedor\nreturn !(remitoEmpty && proveedorEmpty);\n});\n\n// 2) Normalizamos columnas a un JSON prolijo\nreturn filtered.map(item => {\nconst row = item.json;\n\nreturn {\nrowNumber: row.row_number || null,\nnumeroInterno: row[\"Nº\"] || null,\nremito: row[\"Nº de Remito del  Proveedor\"] || null,\nproveedor: row[\"Proveedor\"] || null,\ndescripcion: row[\"Articulos\"] || null,\ncantidad: row[\"Cantidad\"] || null,\n\noc: row[\"Orden de Compra\"] || null,\ncomprador: row[\"Responsable de Compra\"] || null,\nfactura: row[\"Factura\"] || null,\nvencFactura: row[\"Vencimiento FC\"] || null,\n\nguia: row[\"Nº de Guia\"] || null,\nfechaRemito: row[\"Fecha de remito\"] || null,\nfechaDeposito: row[\"Fecha de recepción \\n(Deposito Bs As)\"] || null,\nfechaCol: row[\"Fecha de Recepción (Col)\"] || null,\n\nfechaInforme: row[\"Fecha de Informe\"] || null,\nnroInforme: row[\"Nº de informe \"] || null,\nobservaciones: row[\"Observaciones\"] || null,\n\nflagMail2: row[\"FLAG_MAIL2_Enviado\"] || null,\nlinkDrive: row[\"Link - Drive\"] || null\n};\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -544
+      ],
+      "id": "bcc95fcf-2c0e-42b4-ba69-ef2458e39854",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1a84f440-0163-4045-8212-16e875ea0fcc",
+              "leftValue": "={{ $json.nroInforme }}",
+              "rightValue": "True",
+              "operator": {
+                "type": "boolean",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -544
+      ],
+      "id": "8f049e65-627a-4fb6-a9b5-5edf24ffb6b8",
+      "name": "Informe"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2b34d731-238c-4668-b634-22f64b236d42",
+              "leftValue": "={{ $json.comprador }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "da4b1564-c19a-49b9-b364-be4d0a87e384",
+              "leftValue": "={{ $json.oc }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1a8b6da0-1c7e-4544-80f1-66c2090a8383",
+              "leftValue": "={{ $json.linkDrive }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        -608
+      ],
+      "id": "e28c882d-efdd-4f5a-81d3-1892c6b95ac4",
+      "name": "Error de carga"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d3c6d61-303b-49bc-8424-467495582ead",
+              "leftValue": "={{ $json.comprador }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        -448
+      ],
+      "id": "e9dfe3f2-defe-4203-b50d-4c9cb2e24f3c",
+      "name": "Sin comprador"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1280,
+        -608
+      ],
+      "id": "c2f5a1cb-6949-4e12-b979-105725625572",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1eb372be-9c45-4e6e-8453-2841ddaabe2d",
+              "leftValue": "={{ $json.fechaCol }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        272
+      ],
+      "id": "fcc3947b-3527-4e0c-be1e-0fd74ef6dc3d",
+      "name": "Recepcion_COL"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cae029fe-77e9-447d-b338-3d2520808cbd",
+              "leftValue": "={{ $json.oc }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        144
+      ],
+      "id": "1c76c350-561e-45c6-9387-75963ef8216b",
+      "name": "Con_OC"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a4e6b20c-4409-4caf-8c00-3c719ad5e716",
+              "leftValue": "={{ $json.nroInforme }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        -48
+      ],
+      "id": "587686e0-faf8-41e8-9ffa-bd991be2ad36",
+      "name": "Con_Informe"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1) Tomamos todos los remitos de la rama \"Con_OC → FALSE\"\nconst items = $input.all();\n\n// 2) Primero agregamos el estado a cada fila\nconst filasConEstado = items.map(item => {\n  const r = item.json;\n  return {\n    ...r,\n    estado: \"RECEPCIONADO EN COL\"\n  };\n});\n\n// 3) Agrupar por comprador\nconst grupos = {};\n\nfor (const r of filasConEstado) {\n  const comprador = r.comprador || \"SIN_COMPRADOR\";\n\n  if (!grupos[comprador]) {\n    grupos[comprador] = [];\n  }\n\n  grupos[comprador].push(r);\n}\n\n// 4) Crear un output por comprador (1 item por mail)\nconst salida = Object.keys(grupos).map(comp => {\n  return {\n    json: {\n      comprador: comp,\n      remitos: grupos[comp]\n    }\n  };\n});\n\nreturn salida;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        160
+      ],
+      "id": "64f7ac62-a903-445f-b3df-9d3bbd465a68",
+      "name": "Grup_RECEPCOL"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1) Tomamos todos los remitos EN TRANSITO (input del IF)\nconst items = $input.all();\n\n// 2) Estructura de agrupación { comprador: [remitos...] }\nconst grupos = {};\n\nfor (const item of items) {\n  const r = item.json;\n\n  // Agregar estado EN TRANSITO\n  const fila = {\n    ...r,\n    estado: \"EN TRANSITO HACIA EL COL\"\n  };\n\n  const comprador = fila.comprador || \"SIN_COMPRADOR\";\n\n  // Crear grupo si no existe\n  if (!grupos[comprador]) {\n    grupos[comprador] = [];\n  }\n\n  // Agregar la fila al grupo correspondiente\n  grupos[comprador].push(fila);\n}\n\n// 3) Convertir el objeto de grupos en un array de items para output\nconst salida = Object.keys(grupos).map(comp => {\n  return {\n    json: {\n      comprador: comp,\n      remitos: grupos[comp]\n    }\n  };\n});\n\nreturn salida;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        288
+      ],
+      "id": "74f83d8a-0541-4649-8e28-79640648aab5",
+      "name": "Entransito_SINOC"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1600,
+        240
+      ],
+      "id": "09b9371f-8504-40b9-990d-d079e199bb09",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ======================================================\n// NODO: Group_comprador (con asignación de correos incluida)\n// Entrada: remitos procesados por comprador\n// Salida: { comprador, remitosCOL, remitosTRANSITO, remitosINFORME, emailTo, emailCC }\n// ======================================================\n\nconst items = $input.all();\n\n// ======================================================\n// 1) Diccionario de correos por comprador\n// ======================================================\nconst compradoresEmail = {\n  \"VICTORIA\": {\n    to: \"parajonaugusto@gmail.com\",\n    cc: [\n        \"nbarbieri@oscarbarbierisa.com.ar\",\n        \"aparajon@oscarbarbierisa.com.ar\", \n      \"dlazarte@oscarbarbierisa.com.ar\",\n      \"jperezdelarosa@oscarbarbierisa.com.ar\"\n      \n    ]\n  },\n  \"IVANA\": {\n    to: \"parajonaugusto@gmail.com\",\n    cc: [\n        \"nbarbieri@oscarbarbierisa.com.ar\",\n      \"aparajon@oscarbarbierisa.com.ar\", \n      \"dlazarte@oscarbarbierisa.com.ar\",\n      \"jperezdelarosa@oscarbarbierisa.com.ar\"\n      \n    ]\n  },\n  \"IGNACIO\": {\n    to: \"parajonaugusto@gmail.com\",\n    cc: [\n        \"nbarbieri@oscarbarbierisa.com.ar\",\n      \"aparajon@oscarbarbierisa.com.ar\", \n      \"dlazarte@oscarbarbierisa.com.ar\",\n      \"jperezdelarosa@oscarbarbierisa.com.ar\"\n     \n    ]\n  }\n};\n\n// ======================================================\n// 2) Agrupador por comprador\n// ======================================================\n\nconst mapa = {}; // estructura final\n\nfor (const item of items) {\n  const data = item.json;\n  const comprador = (data.comprador || \"SIN_COMPRADOR\").trim().toUpperCase();\n  const remitos = data.remitos || [];\n\n  // Inicializar estructura si no existe\n  if (!mapa[comprador]) {\n    mapa[comprador] = {\n      comprador,\n      remitosCOL: [],\n      remitosTRANSITO: [],\n      remitosINFORME: []\n    };\n  }\n\n  // Clasificación de remitos\n  for (const r of remitos) {\n    const estado = (r.estado || \"\").toUpperCase().trim();\n    const tieneOC = r.oc !== null && r.oc !== \"\" && r.oc !== 0;\n    const tieneInforme = r.nroInforme !== null && r.nroInforme !== \"\";\n    const flagVacio = r.flagMail2 === null || r.flagMail2 === \"\";\n\n    // 1) INFORMES LISTOS PARA CONCILIAR\n    if (estado === \"INFORME GENERADO\" && tieneOC && tieneInforme && flagVacio) {\n      mapa[comprador].remitosINFORME.push(r);\n      continue;\n    }\n\n    // 2) RECEPCIONADO EN COL SIN OC\n    if (estado === \"RECEPCIONADO EN COL\" && !tieneOC) {\n      mapa[comprador].remitosCOL.push(r);\n      continue;\n    }\n\n    // 3) EN TRANSITO SIN OC\n    if (estado === \"EN TRANSITO HACIA EL COL\" && !tieneOC) {\n      mapa[comprador].remitosTRANSITO.push(r);\n      continue;\n    }\n  }\n}\n\n// ======================================================\n// 3) Agregar correos a cada comprador\n// ======================================================\n\nconst salida = [];\n\nfor (const grupo of Object.values(mapa)) {\n  const comprador = grupo.comprador;\n\n  if (!compradoresEmail[comprador]) {\n    throw new Error(`No existe configuración de correo para el comprador: ${comprador}`);\n  }\n\n  salida.push({\n    json: {\n      ...grupo,\n      emailTo: compradoresEmail[comprador].to,\n      emailCC: compradoresEmail[comprador].cc\n    }\n  });\n}\n\nreturn salida;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        256
+      ],
+      "id": "855e6a9e-084a-4516-8644-dd308fb1a363",
+      "name": "Group_Comprador"
+    },
+    {
+      "parameters": {
+        "jsCode": "// =======================================================\n//   1) TOMAR ENTRADA DESDE EL IF (Con_Informe → TRUE)\n// =======================================================\n\nconst items = $input.all();\n\n// =======================================================\n//   2) FILTRAR SOLO LOS QUE NO TIENEN FLAG DE ENVÍO\n// =======================================================\n\nconst pendientes = items\n  .map(i => i.json)\n  .filter(r => !r.flagMail2 || r.flagMail2 === \"\" || r.flagMail2 === null);\n\n// Si no hay ninguno pendiente → devolver vacío\nif (pendientes.length === 0) {\n  return [];\n}\n\n// =======================================================\n//   3) AGREGAR ESTADO A CADA FILA\n// =======================================================\n\nconst filasConEstado = pendientes.map(r => ({\n  ...r,\n  estado: \"INFORME GENERADO\"\n}));\n\n\n// =======================================================\n//   4) AGRUPAR POR COMPRADOR\n// =======================================================\n\nconst grupos = {};\n\nfor (const fila of filasConEstado) {\n  const comprador = fila.comprador || \"SIN_COMPRADOR\";\n\n  if (!grupos[comprador]) {\n    grupos[comprador] = [];\n  }\n\n  grupos[comprador].push(fila);\n}\n\n\n// =======================================================\n//   5) DEVOLVER 1 ITEM POR COMPRADOR (igual que otras ramas)\n// =======================================================\n\nconst salida = Object.keys(grupos).map(comp => ({\n  json: {\n    comprador: comp,\n    remitos: grupos[comp]\n  }\n}));\n\nreturn salida;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        96
+      ],
+      "id": "bee4f184-a517-44ad-9057-87bf9941d58a",
+      "name": "FiltroMail"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomamos todas las filas que llegan desde Con_Informe (rama FALSE)\nconst items = $input.all();\n\n// Si no hay remitos pendientes de informe, devolvemos un mensaje simple\nif (!items || items.length === 0) {\n  const html = `\n  <h2 style=\"font-family:Arial;\">Ingresos pendientes de informe</h2>\n  <p style=\"font-family:Arial;\">\n    No se detectaron remitos pendientes de informe para el día de hoy.\n  </p>\n  `;\n\n  return [\n    {\n      json: { html }\n    }\n  ];\n}\n\n// Función helper para celdas\nfunction td(value) {\n  return `<td style=\"padding:6px; border:1px solid #ccc;\">${value ?? \"(vacío)\"}</td>`;\n}\n\n// Construimos las filas de la tabla\nlet rowsHTML = \"\";\n\nfor (const item of items) {\n  const r = item.json; // aquí están tus campos: rowNumber, remito, proveedor, etc.\n\n  rowsHTML += `\n    <tr>\n      ${td(r.rowNumber)}\n      ${td(r.remito)}\n      ${td(r.proveedor)}\n      ${td(r.oc)}\n      ${td(r.comprador)}\n      ${td(r.fechaCol)}\n      ${td(\"Generar informe o completar Nº de informe\")}\n    </tr>\n  `;\n}\n\n// HTML completo del mail\nconst html = `\n<h2 style=\"font-family:Arial;\">Ingresos pendientes de informe</h2>\n\n<p style=\"font-family:Arial;\">\n  Se detectaron remitos que ya fueron recepcionados en el Centro de Operaciones Logísticas pero \n  <strong>todavía no tienen informe cargado en el sistema.</strong><br>\n  Por favor proceder a generar el informe correspondiente.<br><br>\n  Si el informe ya fue realizado, por favor completar la tabla con el número de informe correspondiente.\n</p>\n\n<table style=\"border-collapse:collapse; font-family:Arial; font-size:14px;\">\n  <thead>\n    <tr style=\"background-color:#f0f0f0;\">\n      <th style=\"padding:6px; border:1px solid #ccc;\">Fila</th>\n      <th style=\"padding:6px; border:1px solid #ccc;\">Remito</th>\n      <th style=\"padding:6px; border:1px solid #ccc;\">Proveedor</th>\n      <th style=\"padding:6px; border:1px solid #ccc;\">OC</th>\n      <th style=\"padding:6px; border:1px solid #ccc;\">Comprador</th>\n      <th style=\"padding:6px; border:1px solid #ccc;\">Fecha Recepción COL</th>\n      <th style=\"padding:6px; border:1px solid #ccc;\">Tipo de error</th>\n    </tr>\n  </thead>\n  <tbody>\n    ${rowsHTML}\n  </tbody>\n</table>\n\n<p style=\"font-family:Arial; margin-top:20px;\">Muchas gracias.</p>\n`;\n\n// Devolvemos un único item con el HTML\nreturn [\n  {\n    json: { html }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        -64
+      ],
+      "id": "94d412e8-107a-4f1d-bdd3-f2d3f72ba2d4",
+      "name": "CodeMailINg"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all();\n\n// Helper para manejar nulls\nconst val = (x) => (x === null || x === undefined ? \"\" : x);\n\n// Función para construir fila HTML (centrado)\nconst trow = (cells, bg = \"\") =>\n  `<tr style=\"background:${bg};\">\n     ${cells\n       .map(\n         (c) =>\n           `<td style=\"\n                border:1px solid #cccccc; \n                padding:8px; \n                font-size:13px;\n                text-align:center;\n                vertical-align:middle;\">\n              ${c}\n            </td>`\n       )\n       .join(\"\")}\n   </tr>`;\n\n// Encabezado común\nconst header = (cols) =>\n  `<tr style=\"background:#003366; color:white; font-weight:bold;\">\n     ${cols\n       .map(\n         (c) =>\n           `<th style=\"\n                border:1px solid #cccccc; \n                padding:8px; \n                font-size:14px; \n                font-weight:bold;\n                text-align:center;\n                vertical-align:middle;\">\n              ${c}\n            </th>`\n       )\n       .join(\"\")}\n   </tr>`;\n\nconst salida = [];\n\nfor (const item of input) {\n  const {\n    comprador,\n    remitosCOL = [],\n    remitosTRANSITO = [],\n    remitosINFORME = [],\n    emailTo,\n    emailCC\n  } = item.json;\n\n  // No enviar si no hay nada que informar\n  if (\n    remitosCOL.length === 0 &&\n    remitosTRANSITO.length === 0 &&\n    remitosINFORME.length === 0\n  ) {\n    continue;\n  }\n\n  // ======================================================\n  // TABLA 1 — Recepcionado + En tránsito sin OC\n  // ======================================================\n  let tabla1Rows = \"\";\n\n  remitosCOL.forEach((r) => {\n    tabla1Rows += trow(\n      [\n        val(r.rowNumber),\n        val(r.remito),\n        val(r.proveedor),\n        \"\",\n        val(r.factura),\n        val(r.vencFactura),\n        val(r.comprador),\n        val(r.fechaCol),\n        \"Informar OC, factura y vencimiento\",\n        \"Recepcionado en COL\"\n      ],\n      \"#ffe5e5\"\n    );\n  });\n\n  remitosTRANSITO.forEach((r) => {\n    tabla1Rows += trow(\n      [\n        val(r.rowNumber),\n        val(r.remito),\n        val(r.proveedor),\n        \"\",\n        val(r.factura),\n        val(r.vencFactura),\n        val(r.comprador),\n        val(r.fechaRemito),\n        \"Informar OC, factura y vencimiento\",\n        \"En tránsito hacia el COL\"\n      ],\n      \"#fff4cc\"\n    );\n  });\n\n  const tabla1 =\n    tabla1Rows.length === 0\n      ? `<p style=\"font-size:14px;\">No se registran ingresos pendientes.</p>`\n      : `\n      <table style=\"border-collapse:collapse; width:100%; margin-top:10px;\">\n        ${header([\n          \"Fila\",\n          \"Remito\",\n          \"Proveedor\",\n          \"OC\",\n          \"Factura\",\n          \"Vencimiento\",\n          \"Comprador\",\n          \"Fecha Recepción COL\",\n          \"Acción\",\n          \"Estado\"\n        ])}\n        ${tabla1Rows}\n      </table>`;\n\n  // ======================================================\n  // TABLA 2 — Informes listos para conciliar\n  // ======================================================\n  let tabla2Rows = \"\";\n  const rowsToUpdate = [];\n\n  remitosINFORME.forEach((r) => {\n    tabla2Rows += trow(\n      [\n        val(r.remito),\n        val(r.proveedor),\n        `${val(r.descripcion)} (${val(r.cantidad)})`,\n        val(r.oc),\n        val(r.factura),\n        val(r.vencFactura),\n        val(r.fechaInforme),\n        val(r.nroInforme),\n        r.linkDrive\n          ? `<a href=\"${r.linkDrive}\" target=\"_blank\">Ver archivo</a>`\n          : \"\"\n      ],\n      \"#e8f4ff\"\n    );\n\n    rowsToUpdate.push({\n      rowNumber: r.rowNumber,\n      flag: new Date().toISOString().split(\"T\")[0]\n    });\n  });\n\n  const tabla2 =\n    tabla2Rows.length === 0\n      ? `<p style=\"font-size:14px;\">No se registran informes listos para conciliar.</p>`\n      : `\n      <table style=\"border-collapse:collapse; width:100%; margin-top:20px;\">\n        ${header([\n          \"Remito\",\n          \"Proveedor\",\n          \"Artículos\",\n          \"OC\",\n          \"Factura\",\n          \"Vencimiento\",\n          \"Fecha de informe\",\n          \"Número de informe\",\n          \"Link Drive\"\n        ])}\n        ${tabla2Rows}\n      </table>`;\n\n  // ======================================================\n  // SUBJECT\n  // ======================================================\n  const hoy = new Date();\n  const fecha = hoy.toLocaleDateString(\"es-AR\");\n  const subject = `Estado de ingresos COL - ${fecha} - ${comprador}`;\n\n  // ======================================================\n  // HTML FINAL\n  // ======================================================\n  const htmlBody = `\n  <div style=\"font-family:Arial; font-size:14px; color:#333;\">\n    <p>Buenos días <strong>${comprador}</strong> y <strong>Diego</strong></p>\n\n    <p>\n      Te comparto el estado actualizado de ingresos que requieren de tu intervención.\n    </p>\n\n    <div style=\"margin-top:15px; font-weight:bold;\">\n      Ingresos pendientes de OC / Factura / Vencimiento:\n    </div>\n\n    ${tabla1}\n\n    <p style=\"margin-top:25px;\">\n      Ingresos con informe listos para conciliar:\n    </p>\n\n    ${tabla2}\n\n    <p style=\"margin-top:25px;\">\n      Para un detalle completo de <strong>todos los informes pendientes de conciliar</strong>, \n      podés acceder al siguiente panel:\n    </p>\n\n    <p>\n      <a href=\"https://lookerstudio.google.com/u/0/reporting/e581779a-3c42-47e1-a5d0-82b50dae36d2/page/p_o4j2yr0jzd/edit\"\n         target=\"_blank\"\n         style=\"color:#1a73e8; font-weight:bold;\">\n         Ver panel de informes pendientes de conciliar\n      </a>\n    </p>\n\n    <p style=\"margin-top:25px;\">\n      Saludos,<br>\n      <strong>Equipo de Ingresos – COL</strong>\n    </p>\n  </div>\n  `;\n\n  salida.push({\n    json: {\n      comprador,\n      emailTo,\n      emailCC,\n      subject,\n      htmlBody,\n      rowsToUpdate\n    }\n  });\n}\n\nreturn salida;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        256
+      ],
+      "id": "aae016bb-78bf-491a-ac94-c9bbf37e9249",
+      "name": "HTML_MAIL"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ======================================================\n// NODO: Actualizar_Flag\n// Objetivo: a partir de los items del nodo HTML_MAIL,\n// generar una lista \"aplanada\" de actualizaciones:\n// { rowNumber, flag } para cada fila a actualizar.\n// ======================================================\n\n// Traemos TODOS los items generados por el nodo HTML_MAIL\n// (el nombre debe coincidir exactamente con el nombre del nodo)\nconst htmlItems = $items(\"HTML_MAIL\", 0, 0);\n\nconst salida = [];\n\n// Recorremos cada item que salió de HTML_MAIL\nfor (const it of htmlItems) {\n  // Cada item tiene: { comprador, emailTo, emailCC, subject, htmlBody, rowsToUpdate, ... }\n  const updates = it.json.rowsToUpdate || [];\n\n  // Aplanamos las filas de rowsToUpdate\n  for (const u of updates) {\n    if (!u.rowNumber) continue; // seguridad básica\n\n    salida.push({\n      json: {\n        rowNumber: u.rowNumber,\n        flag: u.flag\n      }\n    });\n  }\n}\n\n// Devolvemos una lista de items, uno por fila a actualizar\nreturn salida;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        256
+      ],
+      "id": "ffac0dc4-8286-45c8-bbfe-5423a959984c",
+      "name": "Filas_para_Actualizar"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg",
+          "mode": "list",
+          "cachedResultName": "Control de Recepción de Compras",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1359208426,
+          "mode": "list",
+          "cachedResultName": "2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit#gid=1359208426"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "FLAG_MAIL2_Enviado": "={{ $json.flag }}",
+            "row_number": "={{ $json.rowNumber }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "8006",
+              "displayName": "8006",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nº",
+              "displayName": "Nº",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nº de Remito del  Proveedor",
+              "displayName": "Nº de Remito del  Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Proveedor",
+              "displayName": "Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Articulos",
+              "displayName": "Articulos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cantidad",
+              "displayName": "Cantidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden de Compra",
+              "displayName": "Orden de Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Responsable de Compra",
+              "displayName": "Responsable de Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Factura",
+              "displayName": "Factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimiento FC",
+              "displayName": "Vencimiento FC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nº de Guia",
+              "displayName": "Nº de Guia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de remito",
+              "displayName": "Fecha de remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de recepción \n(Deposito Bs As)",
+              "displayName": "Fecha de recepción \n(Deposito Bs As)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de Recepción (Col)",
+              "displayName": "Fecha de Recepción (Col)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PEDIDO",
+              "displayName": "PEDIDO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Carga Declarada",
+              "displayName": "Carga Declarada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de Informe",
+              "displayName": "Fecha de Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nº de informe ",
+              "displayName": "Nº de informe ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ingreso cerrado",
+              "displayName": "Ingreso cerrado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recepción COL",
+              "displayName": "Recepción COL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Días entre Rto Proveedor y Recpción Depósito Bs As)",
+              "displayName": "Días entre Rto Proveedor y Recpción Depósito Bs As)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias desde recepción en deposito  Bs As",
+              "displayName": "Dias desde recepción en deposito  Bs As",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias entre repeción  en dep Bs As y COL",
+              "displayName": "Dias entre repeción  en dep Bs As y COL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias desde recepción sin informe realizado",
+              "displayName": "Dias desde recepción sin informe realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias entre Recepción e Informe",
+              "displayName": "Dias entre Recepción e Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimiento de Factura",
+              "displayName": "Vencimiento de Factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Prioridad",
+              "displayName": "Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - PRIORIDAD",
+              "displayName": "ID - PRIORIDAD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden Prioridad",
+              "displayName": "Orden Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID-OC",
+              "displayName": "ID-OC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - SIN RECEPCIÓN",
+              "displayName": "ID - SIN RECEPCIÓN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - Sin Informe",
+              "displayName": "ID - Sin Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - PRIORIDAD SEVILLANITA",
+              "displayName": "ID - PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - NUM PRIORIDAD SEVILLANITA",
+              "displayName": "ID - NUM PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ORDEN PRIORIDAD SEVILLANITA",
+              "displayName": "ORDEN PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - PRIORIDAD Infome",
+              "displayName": "ID - PRIORIDAD Infome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - Num Prioridad Informe",
+              "displayName": "ID - Num Prioridad Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden Prioridad Informe",
+              "displayName": "Orden Prioridad Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Días desde Vencimiento",
+              "displayName": "Días desde Vencimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - FECHA VTO",
+              "displayName": "ID - FECHA VTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FLAG_MAIL2_Enviado",
+              "displayName": "FLAG_MAIL2_Enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link - Drive",
+              "displayName": "Link - Drive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2416,
+        256
+      ],
+      "id": "99d9568d-ee7d-4f45-9581-9f6065e70964",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(r => r.json);\n\n// --------------------------------------------------\n// Helpers\n// --------------------------------------------------\nconst isEmpty = (v) => v === null || v === undefined || v === \"\";\n\n// --------------------------------------------------\n// Detección de errores por fila\n// --------------------------------------------------\nfunction detectarErrores(r) {\n  const errores = [];\n\n  if (isEmpty(r.comprador)) errores.push(\"Comprador\");\n  if (r.fechaInforme && isEmpty(r.oc)) errores.push(\"OC\");\n  if (r.fechaInforme && isEmpty(r.linkDrive)) errores.push(\"Link\");\n\n  return errores;\n}\n\nfunction textoTipoError(errores) {\n  return errores.length === 1\n    ? `Falta ${errores[0]}`\n    : `Falta ${errores.join(\" y \")}`;\n}\n\nfunction grupoError(errores) {\n  if (errores.length > 1) return \"D\";\n  if (errores[0] === \"Comprador\") return \"A\";\n  if (errores[0] === \"OC\") return \"B\";\n  if (errores[0] === \"Link\") return \"C\";\n  return \"\";\n}\n\n// Colores por grupo\nconst colores = {\n  A: \"#fff4cc\",\n  B: \"#ffe0b3\",\n  C: \"#e6e6fa\",\n  D: \"#ffd6d6\"\n};\n\n// --------------------------------------------------\n// Construcción del dataset de errores\n// --------------------------------------------------\nconst errores = rows\n  .map(r => {\n    const faltantes = detectarErrores(r);\n    if (faltantes.length === 0) return null;\n\n    return {\n      ...r,\n      faltantes,\n      tipoError: textoTipoError(faltantes),\n      grupo: grupoError(faltantes)\n    };\n  })\n  .filter(Boolean);\n\n// Si no hay errores, no se envía mail\nif (errores.length === 0) {\n  return [{ json: { html: \"\" } }];\n}\n\n// --------------------------------------------------\n// Orden por severidad\n// --------------------------------------------------\nconst prioridad = { D: 1, A: 2, B: 3, C: 4 };\nerrores.sort((a, b) => prioridad[a.grupo] - prioridad[b.grupo]);\n\n// --------------------------------------------------\n// Resumen ejecutivo\n// --------------------------------------------------\nconst resumen = { A: 0, B: 0, C: 0, D: 0 };\nerrores.forEach(e => resumen[e.grupo]++);\n\nconst resumenHTML = `\nSe detectaron <b>${errores.length}</b> errores:\n${resumen.D ? ` ${resumen.D} Falta más de un dato ·` : \"\"}\n${resumen.A ? ` ${resumen.A} Falta comprador ·` : \"\"}\n${resumen.B ? ` ${resumen.B} Falta OC ·` : \"\"}\n${resumen.C ? ` ${resumen.C} Falta Link` : \"\"}\n`;\n\n// --------------------------------------------------\n// Construcción de filas HTML\n// --------------------------------------------------\nlet rowsHTML = \"\";\n\nfor (const r of errores) {\n  const estadoLink = isEmpty(r.linkDrive) ? \"(vacío)\" : \"OK\";\n\n  rowsHTML += `\n  <tr style=\"background-color:${colores[r.grupo]};\">\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.rowNumber}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.remito || \"(vacío)\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.proveedor || \"(vacío)\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.comprador || \"(vacío)\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.oc || \"(vacío)\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.fechaInforme || \"(vacío)\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.nroInforme || \"(vacío)\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${estadoLink}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\">${r.observaciones || \"\"}</td>\n    <td style=\"border:1px solid #cccccc; text-align:center; vertical-align:middle;\"><b>${r.tipoError}</b></td>\n  </tr>`;\n}\n\n// --------------------------------------------------\n// HTML FINAL\n// --------------------------------------------------\nconst html = `\n<h2 style=\"font-family:Arial;\">Correcciones necesarias en la tabla de ingresos</h2>\n\n<p style=\"font-family:Arial; font-size:14px;\">\nSe detectaron filas que requieren completar datos obligatorios.\n</p>\n\n<p style=\"font-family:Arial; font-size:14px;\">\n<b>Reglas:</b><br>\n• Si la fila tiene <b>Informe</b>, deben completarse <b>Orden de Compra, Comprador y Link al Drive</b>.<br>\n• Si la fila <b>no tiene Informe</b>, debe completarse <b>Comprador</b>.\n</p>\n\n<p style=\"font-family:Arial; font-size:14px;\">\n${resumenHTML}\n</p>\n\n<table style=\"border-collapse:collapse; font-family:Arial; font-size:14px; width:100%;\">\n  <thead>\n    <tr style=\"background-color:#003366; color:white; font-weight:bold;\">\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Fila</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Remito</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Proveedor</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Comprador</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Orden Compra</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Fecha Informe</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">N° Informe</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Link</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Observaciones</th>\n      <th style=\"border:1px solid #cccccc; padding:6px; text-align:center;\">Tipo de Error</th>\n    </tr>\n  </thead>\n  <tbody>\n    ${rowsHTML}\n  </tbody>\n</table>\n\n<p style=\"font-family:Arial; margin-top:20px;\">Muchas gracias.</p>\n`;\n\nreturn [{ json: { html } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -608
+      ],
+      "id": "cac7e7d0-6860-4223-a812-f10d28f16edb",
+      "name": "HTML_CORREO_INGRESOS"
+    },
+    {
+      "parameters": {
+        "toRecipients": "turnososcarbarbieri@gmail.com, jperezdelarosa@oscarbarbierisa.com.ar",
+        "subject": "=Revisión Tabla de Ingresos - {{$today.format(\"dd/MM/yyyy\")}}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "ccRecipients": "aparajon@oscarbarbierisa.com.ar, pasantecol@oscarbarbierisa.com.ar",
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        -592
+      ],
+      "id": "f40a1d9d-578e-458e-89f0-e7da811781f7",
+      "name": "Mensaje_Ingresos_Corrección",
+      "webhookId": "af796003-df5d-4254-8c7d-dfeb7e10bdda",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qcEgYCzg59bWCQba",
+          "name": "obsa_IA_Automatizaciones"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "turnososcarbarbieri@gmail.com, jperezdelarosa@oscarbarbierisa.com.ar",
+        "subject": "=Remitos pendientes de ingresos – {{$today.format(\"dd/MM/yyyy\")}}",
+        "bodyContent": "={{ $json.html }}",
+        "additionalFields": {
+          "ccRecipients": "aparajon@oscarbarbierisa.com.ar, pasantecol@oscarbarbierisa.com.ar",
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -64
+      ],
+      "id": "833bfc63-1df9-4f6e-b74b-ca3b4a7d19df",
+      "name": "Mensaje_IngresoOC_COL",
+      "webhookId": "509d37f7-9d26-4dab-8080-4cf80cab2439",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qcEgYCzg59bWCQba",
+          "name": "obsa_IA_Automatizaciones"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.emailTo }}",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.htmlBody }}",
+        "additionalFields": {
+          "ccRecipients": "={{ $json.emailCC }}",
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        256
+      ],
+      "id": "64eec144-3d29-401d-bf61-c29b75bfcdd0",
+      "name": "Send a message",
+      "webhookId": "65a2dd63-cd5e-44da-869d-e9ac940d0081",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qcEgYCzg59bWCQba",
+          "name": "obsa_IA_Automatizaciones"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        -544
+      ],
+      "id": "d3afba16-9242-4556-a9b7-878734c3c117",
+      "name": "07am_Ing_Correccion_Tabla",
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 10
+            },
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                6
+              ],
+              "triggerAtHour": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        272
+      ],
+      "id": "5796e73d-841f-4e7d-8744-396c899358ba",
+      "name": "09AM_COMPRAS",
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 0 7,10-17 * * *"
+            }
+          ]
+        },
+        "output": "raw",
+        "filters": {
+          "custom": "=contains(subject,'Estado de ingresos COL')",
+          "foldersToExclude": [
+            "AQMkADAwATM3ZmYBLWE3ZmQtZWJkMS0wMAItMDAKAC4AAAOApmP0U2RxSKeRyST-iTeHAQDc1oZPTbC5RoQ4fQWy--cwAAACY9gAAAA="
+          ],
+          "foldersToInclude": [
+            "AQMkADAwATM3ZmYBLWE3ZmQtZWJkMS0wMAItMDAKAC4AAAOApmP0U2RxSKeRyST-iTeHAQDc1oZPTbC5RoQ4fQWy--cwAAACAQwAAAA="
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        608
+      ],
+      "id": "5c8f6be7-c509-47d1-a15d-94ce5464b60f",
+      "name": "Respuesta_compradores",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qcEgYCzg59bWCQba",
+          "name": "obsa_IA_Automatizaciones"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0bebb6dd-d94c-4b84-af61-f01215b03bd3",
+              "leftValue": "={{ $json.sender.emailAddress.address }}",
+              "rightValue": "obsa.ia.automatizaciones@outlook.com",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        608
+      ],
+      "id": "35a06f4a-e643-4cf7-b494-6e1a0a1ad6fa",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nodo \"Preparar email para IA\"\n\nconst item = items[0];\n\n// Obtenemos HTML del cuerpo\nconst bodyHtml =\n  (item.json.body && item.json.body.content) ||\n  item.json.rawHtml ||\n  \"\";\n\n// Asunto\nconst subject =\n  item.json.subject ||\n  item.json.emailSubject ||\n  \"\";\n\n// Remitente\nconst sender =\n  (item.json.from &&\n    item.json.from.emailAddress &&\n    item.json.from.emailAddress.address) ||\n  item.json.emailSender ||\n  \"\";\n\n// Función para convertir HTML a texto plano\nfunction htmlToPlain(html) {\n  if (!html) return \"\";\n\n  let text = html;\n\n  // 1) Eliminar <script>...</script> sin regex\n  while (true) {\n    const lower = text.toLowerCase();\n    const start = lower.indexOf(\"<script\");\n    if (start === -1) break;\n    const end = lower.indexOf(\"</script>\", start);\n    if (end === -1) {\n      text = text.slice(0, start);\n      break;\n    }\n    text = text.slice(0, start) + text.slice(end + 9);\n  }\n\n  // 2) Eliminar <style>...</style> sin regex\n  while (true) {\n    const lower = text.toLowerCase();\n    const start = lower.indexOf(\"<style\");\n    if (start === -1) break;\n    const end = lower.indexOf(\"</style>\", start);\n    if (end === -1) {\n      text = text.slice(0, start);\n      break;\n    }\n    text = text.slice(0, start) + text.slice(end + 8);\n  }\n\n  // 3) Convertir </td> y </th> en TAB\n  text = text.replace(new RegExp(\"</td>\", \"gi\"), \"\\t\");\n  text = text.replace(new RegExp(\"</th>\", \"gi\"), \"\\t\");\n\n  // 4) Convertir </tr> en salto de línea\n  text = text.replace(new RegExp(\"</tr>\", \"gi\"), \"\\n\");\n\n  // 5) Convertir <br> y </p> en salto de línea\n  text = text.replace(new RegExp(\"<br\\\\s*/?>\", \"gi\"), \"\\n\");\n  text = text.replace(new RegExp(\"</p>\", \"gi\"), \"\\n\");\n\n  // 6) Quitar el resto de etiquetas HTML\n  text = text.replace(new RegExp(\"<[^>]+>\", \"g\"), \"\");\n\n  // 7) Reemplazar entidades HTML\n  text = text.replace(new RegExp(\"&nbsp;\", \"gi\"), \" \");\n  text = text.replace(new RegExp(\"&amp;\", \"gi\"), \"&\");\n  text = text.replace(new RegExp(\"&lt;\", \"gi\"), \"<\");\n  text = text.replace(new RegExp(\"&gt;\", \"gi\"), \">\");\n  text = text.replace(new RegExp(\"&quot;\", \"gi\"), '\"');\n  text = text.replace(new RegExp(\"&#39;\", \"gi\"), \"'\");\n\n  // 8) Normalizar saltos de línea\n  text = text.replace(/\\r/g, \"\\n\");\n  text = text.replace(/\\n{3,}/g, \"\\n\\n\");\n  text = text.trim();\n\n  return text;\n}\n\nconst bodyText = htmlToPlain(bodyHtml);\n\n// Devolvemos el resultado limpio\nreturn [\n  {\n    json: {\n      subject,\n      sender,\n      bodyHtml,\n      bodyText,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        512
+      ],
+      "id": "cd753881-dea6-4d6f-bd3e-8eb54a28cc1b",
+      "name": "Limpieza"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.bodyText }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Eres un modelo especializado en interpretación de correos de compradores del área de Ingresos de Oscar Barbieri S.A.\n\nTu única tarea es analizar TODO el contenido del correo recibido, incluyendo:\n- Texto libre escrito por el comprador.\n- La tabla original enviada por el bot.\n- Cualquier tabla modificada por el comprador.\n- Instrucciones, notas, correos reenviados o citados.\n- El contenido completo del bodyText recibido desde n8n.\n- Posibles ediciones dentro de las filas.\n- Valores escritos como texto libre fuera de la tabla.\n\nTu objetivo es generar exclusivamente un objeto JSON con la siguiente estructura:\n\n{\n  \"filas\": [\n    {\n      \"fila\": \"<string>\",\n      \"remito\": \"<string>\",\n      \"oc\": \"<string>\",\n      \"factura\": \"<string>\",\n      \"vencimiento\": \"<string>\"\n    }\n  ]\n}\n\nREGLAS DE INTERPRETACIÓN (OBLIGATORIAS)\n\n1. Debes leer SIEMPRE todo el correo completo.\n2. Si existe una tabla HTML, úsala como fuente principal.\n3. Si el comprador modifica valores dentro de la tabla, priorízalos sobre cualquier otro texto.\n4. Si el comprador agrega datos por texto libre, utilízalos solo si no hay tabla modificada.\n5. Si hay valores contradictorios entre tabla y texto libre, prevalece la tabla editada.\n6. Si una fila tiene valores faltantes, completa solo lo disponible y el resto déjalo como \"\".\n7. Nunca inventes información.\n8. Debes devolver TODAS las filas que aparecen en la tabla original del bot aunque el comprador no responda nada.\n9. Las columnas deben respetar el formato exacto en el correo, sin normalizar ni modificar valores.\n10. Convenciones estrictas de formato:\n    - OC: Número o combinación alfanumérica. Ej: \"OC 123456\"\n    - Factura: Número o combinación alfanumérica con posibles caracteres especiales. Ej: \"FC 05-12346-A\"\n    - Vencimiento: Fechas o valores textuales como \"Vence en 7 días\"\n11. No incluyas notas, explicaciones ni comentarios dentro del JSON.\n\nINPUT DESDE EL NODO ANTERIOR\nRecibirás un JSON donde bodyText contiene todo el contenido del correo ya convertido en texto plano. Debes analizar únicamente ese contenido.\n\nFORMATO DE RESPUESTA (OBLIGATORIO)\nDevuelve exclusivamente un objeto JSON con la forma:\n{ \"filas\": [ ... ] }\nNo uses bloques de código, no uses ```json ni ningún tipo de markdown.\nNo agregues texto antes ni después.\nEl resultado debe ser solo JSON válido.\n\nSi no puedes detectar alguna columna, deja su valor como \"\".\nNo incluyas ningún texto adicional fuera del JSON.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        608,
+        512
+      ],
+      "id": "561bf629-8a36-45f6-a366-009d3f59ebf3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        672
+      ],
+      "id": "b7581ded-54b8-47f1-80c4-98c5a6eed347",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "MGKVc9YsZyKIoaBl",
+          "name": "Flujo_Compradores"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Tomamos el texto del LLM\nconst raw = $json[\"text\"];\n\n// 2. Convertimos el string en un JSON real\nconst parsed = JSON.parse(raw);\n\n// 3. Devolverlo para usar en los siguientes nodos\nreturn parsed;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        512
+      ],
+      "id": "8b01c69c-5ca5-41a0-b006-1567989838a8",
+      "name": "Transf_JSON"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "filas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        512
+      ],
+      "id": "27206629-1a75-40bb-8c50-17e33fa71549",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg",
+          "mode": "list",
+          "cachedResultName": "Control de Recepción de Compras",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1359208426,
+          "mode": "list",
+          "cachedResultName": "2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit#gid=1359208426"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Nº",
+              "lookupValue": "={{ $json.fila }}"
+            },
+            {
+              "lookupColumn": "Nº de Remito del  Proveedor",
+              "lookupValue": "={{ $json.remito }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1296,
+        512
+      ],
+      "id": "9f2b7748-3bc7-4594-9328-bace5379d094",
+      "name": "Buscar_filas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg",
+          "mode": "list",
+          "cachedResultName": "Control de Recepción de Compras",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1359208426,
+          "mode": "list",
+          "cachedResultName": "2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18iWqC5cOiDSCQpLxPpwzwAqOxI6SEAlE7DF_XLbsTVg/edit#gid=1359208426"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "Orden de Compra": "={{ $('Split Out').item.json.oc || $json['Orden de Compra'] }}\n",
+            "Factura": "={{ $('Split Out').item.json.factura || $json['Factura'] }}\n",
+            "Vencimiento FC": "={{ $('Split Out').item.json.vencimiento || $json['Vencimiento FC'] }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Nº",
+              "displayName": "Nº",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nº de Remito del  Proveedor",
+              "displayName": "Nº de Remito del  Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Proveedor",
+              "displayName": "Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Articulos",
+              "displayName": "Articulos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cantidad",
+              "displayName": "Cantidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden de Compra",
+              "displayName": "Orden de Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Responsable de Compra",
+              "displayName": "Responsable de Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Factura",
+              "displayName": "Factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimiento FC",
+              "displayName": "Vencimiento FC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nº de Guia",
+              "displayName": "Nº de Guia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de remito",
+              "displayName": "Fecha de remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de recepción \n(Deposito Bs As)",
+              "displayName": "Fecha de recepción \n(Deposito Bs As)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de Recepción (Col)",
+              "displayName": "Fecha de Recepción (Col)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PEDIDO",
+              "displayName": "PEDIDO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Carga Declarada",
+              "displayName": "Carga Declarada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de Informe",
+              "displayName": "Fecha de Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nº de informe ",
+              "displayName": "Nº de informe ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ingreso cerrado",
+              "displayName": "Ingreso cerrado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recepción COL",
+              "displayName": "Recepción COL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Días entre Rto Proveedor y Recpción Depósito Bs As)",
+              "displayName": "Días entre Rto Proveedor y Recpción Depósito Bs As)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias desde recepción en deposito  Bs As",
+              "displayName": "Dias desde recepción en deposito  Bs As",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias entre repeción  en dep Bs As y COL",
+              "displayName": "Dias entre repeción  en dep Bs As y COL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias desde recepción sin informe realizado",
+              "displayName": "Dias desde recepción sin informe realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dias entre Recepción e Informe",
+              "displayName": "Dias entre Recepción e Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimiento de Factura",
+              "displayName": "Vencimiento de Factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Prioridad",
+              "displayName": "Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - PRIORIDAD",
+              "displayName": "ID - PRIORIDAD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden Prioridad",
+              "displayName": "Orden Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID-OC",
+              "displayName": "ID-OC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - SIN RECEPCIÓN",
+              "displayName": "ID - SIN RECEPCIÓN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - Sin Informe",
+              "displayName": "ID - Sin Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - PRIORIDAD SEVILLANITA",
+              "displayName": "ID - PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - NUM PRIORIDAD SEVILLANITA",
+              "displayName": "ID - NUM PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ORDEN PRIORIDAD SEVILLANITA",
+              "displayName": "ORDEN PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - PRIORIDAD Infome",
+              "displayName": "ID - PRIORIDAD Infome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - Num Prioridad Informe",
+              "displayName": "ID - Num Prioridad Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden Prioridad Informe",
+              "displayName": "Orden Prioridad Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Días desde Vencimiento",
+              "displayName": "Días desde Vencimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID - FECHA VTO",
+              "displayName": "ID - FECHA VTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FLAG_MAIL2_Enviado",
+              "displayName": "FLAG_MAIL2_Enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link - Drive",
+              "displayName": "Link - Drive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        512
+      ],
+      "id": "012fe473-f4fe-4699-9007-7ef656e9465e",
+      "name": "Actualizacion_de_datos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $('Respuesta_compradores').item.json.id }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "AQMkADAwATM3ZmYBLWE3ZmQtZWJkMS0wMAItMDAKAC4AAAOApmP0U2RxSKeRyST-iTeHAQDc1oZPTbC5RoQ4fQWy--cwAAACY9gAAAA=",
+          "mode": "list",
+          "cachedResultName": "Procesados_IA",
+          "cachedResultUrl": "https://outlook.office365.com/mail/AQMkADAwATM3ZmYBLWE3ZmQtZWJkMS0wMAItMDAKAC4AAAOApmP0U2RxSKeRyST%2FiTeHAQDc1oZPTbC5RoQ4fQWy%2F%2FcwAAACY9gAAAA%3D"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        512
+      ],
+      "id": "4ad06ec3-888c-46ab-8253-330c5a3ab458",
+      "name": "Move a message",
+      "webhookId": "f4117c3c-5341-4962-977d-cbf0514d79b6",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qcEgYCzg59bWCQba",
+          "name": "obsa_IA_Automatizaciones"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c3bfd64c-77b6-4811-95fb-9fbdc1126c34",
+              "leftValue": "={{ $json.html }}",
+              "rightValue": "\"<tr\"",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        -608
+      ],
+      "id": "c886e371-a395-4d8a-8339-fbcbce29a947",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    noErrorCarga: true\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -272
+      ],
+      "id": "6b2d0175-dfec-4bbb-9f4a-49ab2b5a7de1",
+      "name": "Sin_ERROR_DE_CARGA"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    noErrorSinComprador: true\n  }\n}];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -432
+      ],
+      "id": "0952808c-3b40-4a82-bdd4-4a2b42bd64ad",
+      "name": "Sin_ERROR_COMPRADOR"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1280,
+        -352
+      ],
+      "id": "368dacb7-c93a-448e-a4b9-9bbeb4c0bea2",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst noErrorCarga = items.some(i => i.json.noErrorCarga === true);\nconst noErrorSinComprador = items.some(i => i.json.noErrorSinComprador === true);\n\nreturn [{\n  json: {\n    noHayErrores: noErrorCarga && noErrorSinComprador\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        -352
+      ],
+      "id": "bc4fe801-643d-4fdd-af9d-f9eb871ce7d1",
+      "name": "Evaluacion de errores"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "df3a9296-bb22-4f10-bd97-79ceb03daf00",
+              "leftValue": "={{ $json.noHayErrores }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1696,
+        -352
+      ],
+      "id": "3c8dce70-7254-456d-9bc9-a8dd109a3c4b",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const hoy = new Date();\nconst fecha = hoy.toLocaleDateString(\"es-AR\");\n\nconst subject = `Control de ingresos COL – Sin observaciones – ${fecha}`;\n\nconst htmlBody = `\n<div style=\"font-family: Arial, sans-serif; font-size:14px; color:#333;\">\n\n  <!-- TÍTULO -->\n  <h2 style=\"\n    font-size:18px;\n    font-weight:bold;\n    color:#003366;\n    margin-bottom:20px;\n  \">\n    Control de ingresos COL – Sin observaciones\n    <span style=\"color:#2e7d32; font-weight:bold;\"> ✔</span>\n  </h2>\n  \n  <p>\n    Informamos que el proceso automático de control de ingresos correspondiente al día \n    <strong>${fecha}</strong> se ejecutó correctamente.\n  </p>\n\n  <p>\n    En esta ejecución <strong>no se detectaron ingresos pendientes de corrección</strong> \n    (sin comprador / error de carga).\n  </p>\n\n  <p>\n    Por lo tanto, <strong>no se requiere acción de correción de filas</strong> por parte del área.\n  </p>\n\n  <p style=\"margin-top:25px;\">\n    Saludos,<br>\n    <strong>Sistema Automático de Control de Ingresos – Centro de Operaciones Logísticas</strong>\n  </p>\n\n</div>\n`;\n\nreturn [\n  {\n    json: {\n      subject,\n      htmlBody\n    }\n  }\n];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -368
+      ],
+      "id": "c811a6d5-f542-4024-924f-032eb0fd8146",
+      "name": "HTML CORREO OK"
+    },
+    {
+      "parameters": {
+        "toRecipients": "turnososcarbarbieri@gmail.com, jperezdelarosa@oscarbarbierisa.com.ar",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.htmlBody }}",
+        "additionalFields": {
+          "ccRecipients": "aparajon@oscarbarbierisa.com.ar, pasantecol@oscarbarbierisa.com.ar",
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        -368
+      ],
+      "id": "d283967d-edad-4b86-ab6e-36e5c3c90d4f",
+      "name": "Mail_OK",
+      "webhookId": "52aae981-1ba7-4db6-8e3e-fe96c84a9131",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "qcEgYCzg59bWCQba",
+          "name": "obsa_IA_Automatizaciones"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4843365d-b021-4ebe-a082-7dd4c7b403ee",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        -1360
+      ],
+      "id": "7920fbc2-453d-485e-8261-cbde0e2b1a2f",
+      "name": "Webhook",
+      "webhookId": "4843365d-b021-4ebe-a082-7dd4c7b403ee"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ebe1a90-2201-4bb6-a7c3-7de82dda717d",
+              "name": "grupo_id",
+              "value": "={{$json.body.data.key.remoteJid}}",
+              "type": "string"
+            },
+            {
+              "id": "0f50f523-f3bd-4748-af72-6aad8d1b01a7",
+              "name": "mensaje_id",
+              "value": "={{$json.body.data.key.id}}",
+              "type": "string"
+            },
+            {
+              "id": "eea08bdb-59e8-4164-b4b5-fe32e2738e06",
+              "name": "mensaje_texto",
+              "value": "={{$json.body.data.message?.conversation\n?? $json.body.data.message?.extendedTextMessage?.text\n?? $json.body.data.message?.imageMessage?.caption\n?? null}}",
+              "type": "string"
+            },
+            {
+              "id": "e3c798ea-7dfb-455b-baec-9d9c1cd88d03",
+              "name": "numero_comprador",
+              "value": "={{$json.body.data.key.participantAlt}}",
+              "type": "string"
+            },
+            {
+              "id": "88602c08-f02a-4832-82e2-aba99aaf3d6b",
+              "name": "sender",
+              "value": "={{$json.body.sender}}",
+              "type": "string"
+            },
+            {
+              "id": "38c8eca6-dc11-46c0-b69f-afbb4d0bb204",
+              "name": "fecha_evento",
+              "value": "={{$json.body.date_time}}",
+              "type": "string"
+            },
+            {
+              "id": "35aaf9ab-7c9d-46ef-a38a-a18a8657c231",
+              "name": "tipo_mensaje",
+              "value": "={{$json.body.data.messageType}}",
+              "type": "string"
+            },
+            {
+              "id": "a8702258-bff5-4721-a0ac-83c705d8b453",
+              "name": "reply_to",
+              "value": "={{$json.body.data.message?.messageContextInfo?.threadId[0] ?? null}}",
+              "type": "string"
+            },
+            {
+              "id": "32b01508-2ba2-4ca0-af86-8075364ebaf1",
+              "name": "media_id",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "69361922-d27d-4cde-9996-05ea8f4cffed",
+              "name": "procesado",
+              "value": "PENDIENTE",
+              "type": "string"
+            },
+            {
+              "id": "19a1fa82-526e-4611-9094-827c4b082d81",
+              "name": "grupo_logico",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "2dea94f6-8cb9-4f00-b250-881159a7cd62",
+              "name": "buyer_id",
+              "value": "={{\n  {\n    \"5493815906428@s.whatsapp.net\": \"Jorge Ibañez (Tpe)\",\n    \"5491164249860@s.whatsapp.net\": \"Martin Otero (Tpe)\",\n    \"5491158866888@s.whatsapp.net\": \"Transporte Sevillanita (Tpe)\",\n    \"5493814491080@s.whatsapp.net\": \"Victoria\",\n    \"5493815191005@s.whatsapp.net\": \"Ignacio\",\n    \"5493813513108@s.whatsapp.net\": \"Ivana\",\n    \"5493813044653@s.whatsapp.net\": \"Diego Lazarte\",\n    \"5493816439297@s.whatsapp.net\": \"Javier\",\n    \"5493816811504@s.whatsapp.net\": \"Augusto Parajón\",\n    \"5493813373290@s.whatsapp.net\": \"Andrea Almiron\",\n    \"5493814134398@s.whatsapp.net\": \"Sector Ingresos OBSA\",\n    \"5493816211044@s.whatsapp.net\": \"Juan Figueroa (Tpe)\",\n    \"5493814127771@s.whatsapp.net\": \"Nicolás Barbieri\",\n    \"5493814138009@s.whatsapp.net\": \"Oscar Barbieri Padre\",\n    \"5491159085662@s.whatsapp.net\": \"Arocha Fernando (Tpe)\"\n  }[$json.body.data.key.participantAlt] ?? \"DESCONOCIDO\"\n}}\n",
+              "type": "string"
+            },
+            {
+              "id": "f6bca967-b3e9-4595-b229-53ab872fbe01",
+              "name": "image_url",
+              "value": "={{ $json.body.data.message.imageMessage.url }}",
+              "type": "string"
+            },
+            {
+              "id": "025c4fea-3520-4b6c-818a-76761a3e1e2e",
+              "name": "image_mimetype",
+              "value": "={{ $json.body.data.message.imageMessage.mimetype }}",
+              "type": "string"
+            },
+            {
+              "id": "75df7f54-b124-473f-98ee-1baa88d0bb67",
+              "name": "image_caption",
+              "value": "={{ $json.body.data.message.imageMessage.caption ?? null }}",
+              "type": "string"
+            },
+            {
+              "id": "f71f6dc3-6e3b-490d-897b-edb380b79600",
+              "name": "=image_thumbnail_bytes",
+              "value": "={{ $json.body.data.message.imageMessage.jpegThumbnail }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        -1376
+      ],
+      "id": "421f99eb-ee35-4153-8912-ad422847f9a5",
+      "name": "SET_ALMACENAMIENTO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "716ff9dc-61c4-40ae-a7d3-1ec4ac281c75",
+              "leftValue": "={{$json.body.data.key.remoteJid}}",
+              "rightValue": "5491164249860-1604956898@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -64,
+        -1360
+      ],
+      "id": "f42a8e22-f9e9-4334-ba04-a51f8b3d9342",
+      "name": "Filtro_Grupo_Compras"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        -1168
+      ],
+      "id": "68f8a37a-3db2-4e88-94c3-ddf05b45e673",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "procesado",
+              "lookupValue": "PENDIENTE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -64,
+        -1168
+      ],
+      "id": "8f0fa367-3138-4cb1-b643-bae17baa7e78",
+      "name": "LECTURA_INFO",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "grupo_id",
+              "displayName": "grupo_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje_id",
+              "displayName": "mensaje_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje_texto",
+              "displayName": "mensaje_texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numero_comprador",
+              "displayName": "numero_comprador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_evento",
+              "displayName": "fecha_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_mensaje",
+              "displayName": "tipo_mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        -1376
+      ],
+      "id": "710bb3d6-5673-40b9-b676-de99ad22bb13",
+      "name": "Colector_INFO",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "272c562b-9f37-4041-a550-2fc13ee12156",
+              "name": "grupo_logico",
+              "value": "=GL_{{$now.format(\"yyyyMMdd_HHmm\")}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        -1168
+      ],
+      "id": "57cbc07c-d411-4a74-95aa-e09ada13aa6e",
+      "name": "Grupo_Logico"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "grupo_id",
+              "displayName": "grupo_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mensaje_id",
+              "displayName": "mensaje_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mensaje_texto",
+              "displayName": "mensaje_texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numero_comprador",
+              "displayName": "numero_comprador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_evento",
+              "displayName": "fecha_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_mensaje",
+              "displayName": "tipo_mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply_to",
+              "displayName": "reply_to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "media_id",
+              "displayName": "media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buyer_id",
+              "displayName": "buyer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "procesado",
+              "displayName": "procesado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "grupo_logico",
+              "displayName": "grupo_logico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_mimetype",
+              "displayName": "image_mimetype",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_caption",
+              "displayName": "image_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_thumbnail_bytes",
+              "displayName": "image_thumbnail_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        -1168
+      ],
+      "id": "e7fd98b8-9cdf-41ce-8c86-71430513015a",
+      "name": "Escribir_GrupoLogico",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3f3e3127-86e8-4bcd-966b-09bef7175fe9",
+              "leftValue": "={{ $json.tipo_mensaje }}",
+              "rightValue": "imageMessage",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cd7e8349-914b-4626-a447-2a3b7399c97e",
+              "leftValue": "={{ $json.media_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -1168
+      ],
+      "id": "7c6112c0-850c-4e19-b552-f7af21b1cf1f",
+      "name": "Filtro_Img"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://automatizacion-obsa-evolution-api.rjkvmk.easypanel.host/chat/getBase64FromMediaMessage/AutomatizacionesOBSA",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "429683C4C977415CAAFCCE10F7D57E11"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"key\": {\n      \"id\": \"{{ $json.media_id }}\"\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        768,
+        -1312
+      ],
+      "id": "0cad0c3e-3b1f-4001-b90c-7e2eae2bfd89",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "binaryPropertyName": "image",
+        "options": {
+          "fileName": "={{ $json.mensaje_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        -1312
+      ],
+      "id": "793a9770-11f1-482a-b5d4-97223a6d8d89",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const original = $items(\"Filtro_Img\")[$itemIndex].json;\n\nreturn {\n  json: {\n    ...original,   // identidad (row_number, mensaje_id, etc.)\n    ...item.json   // respuesta del HTTP (base64, mimetype, etc.)\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -1312
+      ],
+      "id": "22401ec0-5164-4bfc-aeaa-da1b4faf203f",
+      "name": "MergeCode"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "=Sos un asistente experto en análisis de documentación logística y remitos de proveedores.\nTu tarea es analizar imágenes de remitos y extraer información estructurada con criterio operativo.\n\nNo inventes datos.\nSi un dato no está presente de forma explícita o razonablemente inferible, devolvé null.\nRespondé exclusivamente en formato JSON válido.\n\nAnalizá la imagen del remito adjunta y extraé la siguiente información:\n\n1. proveedor_nombre:\n   Nombre comercial del proveedor emisor del remito.\n\n2. numero_remito:\n   Número de remito indicado en el documento.\n   Regla de formato obligatoria:\n   - Formato esperado: 4 dígitos - 8 dígitos - sufijo \"R\" (ejemplo: 0020-00015545-R).\n   - Si el número aparece incompleto (ej: 20-15545, 15545, 00015545, etc.), completá con ceros a la izquierda hasta cumplir el formato.\n   - Si no se puede identificar con certeza, devolver null.\n\n3. fecha_remito:\n   Fecha del remito indicada en el documento.\n\n4. numero_factura_asociada:\n   Número de factura si el remito la referencia explícitamente.\n   Aplica la misma regla de formato que numero_remito.\n   Si no hay referencia clara, devolver null.\n\n5. fecha_recepcion_transporte:\n   Fecha indicada en sellos, etiquetas o comprobantes de recepción del transporte.\n   Reglas obligatorias:\n   - No puede ser anterior a la fecha del remito y No puede ser posterior a la fecha del mensaje de WhatsApp.\n   - Debe cumplir: fecha_remito ≤ fecha_recepcion_transporte ≤ fecha_mensaje. (EXCLUYENTE)\n   - Si se detecta una fecha fuera de ese rango, se considera inválida y se debe devolver fecha_remito + 1\n   - No inventes fechas y cumple todas las reglas anteriores.\n\n6. categoria_productos_resumen:\n   Una única categoría general que resuma los productos incluidos.\n   Ejemplos válidos: \"electrodomésticos\", \"muebles\", \"indumentaria\", \"tecnología\".\n   No listar productos individuales ni marcas.\n\n7. cantidad_total_articulos:\n   Suma total de las cantidades de todos los ítems del remito.\n   Si no se puede calcular con certeza, devolver null.\n\n8. mensaje_id:\n   Usá exclusivamente el nombre original del archivo de imagen (sin extensión).\n   Este valor se recibe desde el sistema y no debe inferirse desde la imagen.\n   Valor esperado: {{ $binary.image.fileName }}\n\nDevolvé la información EXCLUSIVAMENTE como un objeto JSON válido.\nNo incluyas texto adicional, encabezados, explicaciones ni markdown.\nNo repitas claves.\nNo devuelvas arrays, solo un objeto JSON plano.\n",
+        "inputType": "base64",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1472,
+        -1312
+      ],
+      "id": "f0ecc855-5479-471e-9c02-41497c600dbf",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "MGKVc9YsZyKIoaBl",
+          "name": "Flujo_Compradores"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4f5b1831-8537-47b6-8a59-b73b12fcb360",
+              "name": "proveedor_nombre",
+              "value": "={{ $json[0].content[0].text.match(/\"proveedor_nombre\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}\n",
+              "type": "string"
+            },
+            {
+              "id": "96a281ae-3b6f-4ece-9bb5-6e6c08d65eed",
+              "name": "numero_remito",
+              "value": "={{ $json[0].content[0].text.match(/\"numero_remito\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}",
+              "type": "string"
+            },
+            {
+              "id": "1183f989-57f9-4536-9e24-85589a6e164e",
+              "name": "fecha_remito",
+              "value": "={{ $json[0].content[0].text.match(/\"fecha_remito\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}",
+              "type": "string"
+            },
+            {
+              "id": "031b5b24-1e78-4754-940d-a016e3d13534",
+              "name": "numero_factura_asociada",
+              "value": "={{ $json[0].content[0].text.match(/\"numero_factura_asociada\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}",
+              "type": "string"
+            },
+            {
+              "id": "7a60afc0-060e-4a12-a567-3a7d94182abf",
+              "name": "fecha_recepcion_transporte",
+              "value": "={{ $json[0].content[0].text.match(/\"fecha_recepcion_transporte\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}",
+              "type": "string"
+            },
+            {
+              "id": "b77563fe-8e20-41af-8081-8fe5d2911661",
+              "name": "categoria_productos_resumen",
+              "value": "={{ $json[0].content[0].text.match(/\"categoria_productos_resumen\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}",
+              "type": "string"
+            },
+            {
+              "id": "fdf082c8-2fba-44be-bba7-8da2696a5316",
+              "name": "cantidad_total_articulos",
+              "value": "={{ Number($json[0].content[0].text.match(/\"cantidad_total_articulos\"\\s*:\\s*(\\d+)/)?.[1]) || null }}",
+              "type": "string"
+            },
+            {
+              "id": "d1936419-2ac3-4a84-8630-5ebceefe7f90",
+              "name": "=mensaje_id",
+              "value": "={{ $json[0].content[0].text.match(/\"mensaje_id\"\\s*:\\s*\"([^\"]+)\"/)?.[1] || null }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1872,
+        -1312
+      ],
+      "id": "b732e109-7623-4fb8-8bd8-6edc8920151b",
+      "name": "Normal_Campos_Remitos"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "mensaje_id",
+        "joinMode": "enrichInput2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1264,
+        -1072
+      ],
+      "id": "607f0972-ca37-43d0-bb4f-e0dcf052bbce",
+      "name": "Merge_Info_Completa"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{$json.row_number}}\n",
+            "proveedor_nombre": "={{$json.proveedor_nombre}}",
+            "numero_remito": "={{$json.numero_remito}}",
+            "fecha_remito": "={{$json.fecha_remito}}",
+            "numero_factura_asociada": "={{$json.numero_factura_asociada}}",
+            "fecha_recepcion_transporte": "={{$json.fecha_recepcion_transporte}}",
+            "categoria_productos_resumen": "={{$json.categoria_productos_resumen}}",
+            "cantidad_total_articulos": "={{$json.cantidad_total_articulos}}",
+            "estado": "ANALIZADO_IMAGEN",
+            "grupo_logico": "={{ $json.grupo_logico }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "grupo_id",
+              "displayName": "grupo_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mensaje_id",
+              "displayName": "mensaje_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mensaje_texto",
+              "displayName": "mensaje_texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "numero_comprador",
+              "displayName": "numero_comprador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha_evento",
+              "displayName": "fecha_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tipo_mensaje",
+              "displayName": "tipo_mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reply_to",
+              "displayName": "reply_to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "media_id",
+              "displayName": "media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "buyer_id",
+              "displayName": "buyer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "procesado",
+              "displayName": "procesado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "grupo_logico",
+              "displayName": "grupo_logico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_mimetype",
+              "displayName": "image_mimetype",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_caption",
+              "displayName": "image_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_thumbnail_bytes",
+              "displayName": "image_thumbnail_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "proveedor_nombre",
+              "displayName": "proveedor_nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "numero_remito",
+              "displayName": "numero_remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha_remito",
+              "displayName": "fecha_remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "numero_factura_asociada",
+              "displayName": "numero_factura_asociada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha_recepcion_transporte",
+              "displayName": "fecha_recepcion_transporte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria_productos_resumen",
+              "displayName": "categoria_productos_resumen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cantidad_total_articulos",
+              "displayName": "cantidad_total_articulos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        -1072
+      ],
+      "id": "e416ca46-94ce-4603-ba2d-321c79950e56",
+      "name": "Actualizacion_Rto",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "grupo_logico",
+              "lookupValue": "={{ $json.grupo_logico }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1680,
+        -1072
+      ],
+      "id": "f10e695a-5bc5-4a61-8857-2af277bac404",
+      "name": "Leer_Contexto",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Analizá la siguiente conversación de WhatsApp y definí el destino logístico de cada remito listado.\n\nLeé la conversación en orden cronológico.\nUsá los mensajes como evidencia para decidir.\n\nReglas:\n- Un reply directo define el destino de ese remito y el comprador responsable.\n- Un mensaje global aplica a remitos anteriores y define el comprador responsable.\n- Los remitos pueden tomar destino de días posteriores.\n- PENDIENTE solo se asigna si el remito es el último mensaje del día y no existe ningún mensaje posterior.\n- En cualquier otro caso donde no haya evidencia explícita, el destino es TUC y el comprador lo determinas por contexto.\n\nDestinos válidos:\nTUC | MELI | RECHAZADO | PENDIENTE\n\nSalida:\nUna línea por cada remito, usando exactamente este formato:\nrow_number | mensaje_id | numero_remito | destino | comprador_responsable | nivel_confianza | justificacion\n\nNo agregues encabezados, notas ni explicaciones extra.\n\nTexto a analizar:\n{{$json.prompt_llm}}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        2064,
+        -1072
+      ],
+      "id": "3c4aa925-b842-4c49-a991-05f265452be0",
+      "name": "Análisis_destino",
+      "credentials": {
+        "openAiApi": {
+          "id": "MGKVc9YsZyKIoaBl",
+          "name": "Flujo_Compradores"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// items[] = mensajes individuales del grupo lógico\n\n// 1) Construir mensajes[] normalizados desde items\nconst mensajes = items.map(item => {\n  const m = item.json;\n\n  return {\n    mensaje_id: m.mensaje_id,\n    mensaje_texto: m.mensaje_texto || \"\",\n    buyer_id: m.buyer_id || null,\n    fecha_evento: m.fecha_evento,\n    reply_to: m.reply_to || \"\"\n  };\n});\n\n// 2) Ordenar mensajes cronológicamente\nmensajes.sort(\n  (a, b) => new Date(a.fecha_evento) - new Date(b.fecha_evento)\n);\n\n// 3) Construir universo cerrado de remitos\nconst remitosMap = {};\n\nitems.forEach(item => {\n  const m = item.json;\n\n  if (m.numero_remito && m.numero_remito.trim() !== \"\") {\n    if (!remitosMap[m.numero_remito]) {\n      remitosMap[m.numero_remito] = {\n        numero_remito: m.numero_remito,\n        mensajes_ids: [],\n        proveedor_nombre: (m.proveedor_nombre || \"\").trim(),\n        row_number: m.row_number\n      };\n    }\n\n    remitosMap[m.numero_remito].mensajes_ids.push(m.mensaje_id);\n  }\n});\n\nconst remitos = Object.values(remitosMap);\n\n// 4) Construir texto de remitos (literal)  ✅ INCLUYE row_number\nlet textoRemitos = `REMITOS_A_PROCESAR:\\n`;\n\nremitos.forEach((r, idx) => {\n  textoRemitos +=\n    `- REMITO_${idx + 1}\\n` +\n    `  row_number: ${r.row_number}\\n` +\n    `  numero_remito: ${r.numero_remito}\\n` +\n    `  mensaje_id: ${r.mensajes_ids.join(\", \")}\\n` +\n    `  proveedor: ${r.proveedor_nombre}\\n\\n`;\n});\n\n// 5) Construir texto de conversación\nlet textoConversacion = `CONVERSACION (orden cronologico):\\n`;\n\nmensajes.forEach(m => {\n  const fecha = new Date(m.fecha_evento)\n    .toISOString()\n    .slice(0, 16)\n    .replace(\"T\", \" \");\n\n  const texto =\n    m.mensaje_texto && m.mensaje_texto.trim() !== \"\"\n      ? m.mensaje_texto\n      : \"(sin texto)\";\n\n  const reply = m.reply_to ? ` [reply a ${m.reply_to}]` : \"\";\n\n  textoConversacion +=\n    `[${fecha}| ${m.mensaje_id}] ${m.buyer_id || \"SIN_BUYER\"}: ${texto}${reply}\\n`;\n});\n\n// 6) Texto final para el LLM\nconst textoFinal =\n  `GRUPO_LOGICO: ${items[0].json.grupo_logico}\\n\\n` +\n  textoRemitos + `\\n` +\n  textoConversacion;\n\n// 7) Output único\nreturn [\n  {\n    json: {\n      prompt_llm: textoFinal\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        -1072
+      ],
+      "id": "16a260ef-7731-42a0-a51b-8a4980bcfc9b",
+      "name": "Code_Conversacion_LLM"
+    },
+    {
+      "parameters": {
+        "jsCode": "// El texto completo devuelto por el LLM\nconst texto = items[0].json.output[0].content[0].text;\n\n// 1) Separar por líneas (una línea = un remito)\nconst lineas = texto\n  .split(\"\\n\")\n  .map(l => l.trim())\n  .filter(l => l !== \"\");\n\n// 2) Parsear cada línea\nconst resultados = lineas.map(linea => {\n  const partes = linea.split(\"|\").map(p => p.trim());\n\n  return {\n    row_number: Number(partes[0]),\n    mensaje_id: partes[1],\n    numero_remito: partes[2],\n    destino: partes[3],\n    comprador_responsable: partes[4] || null,\n    nivel_confianza: partes[5],\n    justificacion: partes.slice(6).join(\" | \")\n  };\n});\n\n// 3) Devolver un item por remito (ideal para update por row_number)\nreturn resultados.map(r => ({ json: r }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        -1072
+      ],
+      "id": "9fef6c27-a087-4153-80cc-a1adff5d8d4a",
+      "name": "Code_Normalizacion_LLM"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "destino_logistico": "={{ $json.destino }}",
+            "Nivel_confianza": "={{ $json.nivel_confianza }}",
+            "Justificacion_LLM": "={{ $json.justificacion }}",
+            "Fecha_analisis": "={{$now}}",
+            "estado": "Pendiente de Exportar",
+            "procesado": "OK",
+            "Comprador_Asignado": "={{ $json.comprador_responsable }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "grupo_id",
+              "displayName": "grupo_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mensaje_id",
+              "displayName": "mensaje_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mensaje_texto",
+              "displayName": "mensaje_texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "numero_comprador",
+              "displayName": "numero_comprador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_evento",
+              "displayName": "fecha_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tipo_mensaje",
+              "displayName": "tipo_mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reply_to",
+              "displayName": "reply_to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "media_id",
+              "displayName": "media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "buyer_id",
+              "displayName": "buyer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "procesado",
+              "displayName": "procesado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "grupo_logico",
+              "displayName": "grupo_logico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_mimetype",
+              "displayName": "image_mimetype",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_caption",
+              "displayName": "image_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_thumbnail_bytes",
+              "displayName": "image_thumbnail_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "proveedor_nombre",
+              "displayName": "proveedor_nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "numero_remito",
+              "displayName": "numero_remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_remito",
+              "displayName": "fecha_remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "numero_factura_asociada",
+              "displayName": "numero_factura_asociada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_recepcion_transporte",
+              "displayName": "fecha_recepcion_transporte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "categoria_productos_resumen",
+              "displayName": "categoria_productos_resumen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cantidad_total_articulos",
+              "displayName": "cantidad_total_articulos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "destino_logistico",
+              "displayName": "destino_logistico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Comprador_Asignado",
+              "displayName": "Comprador_Asignado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nivel_confianza",
+              "displayName": "Nivel_confianza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Justificacion_LLM",
+              "displayName": "Justificacion_LLM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha_analisis",
+              "displayName": "Fecha_analisis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        -832
+      ],
+      "id": "4ad4f365-fa3d-46b4-8ddb-a3eb84d511d6",
+      "name": "Actulizacion_Destino",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "estado",
+              "lookupValue": "Pendiente de Exportar"
+            },
+            {
+              "lookupColumn": "destino_logistico",
+              "lookupValue": "TUC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1152,
+        -832
+      ],
+      "id": "d3c4b85c-a110-4052-992a-27b2b24ff3fd",
+      "name": "Datos_para_exportar",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1290165180,
+          "mode": "list",
+          "cachedResultName": "Hoja 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=1290165180"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nº de Remito del  Proveedor": "={{ $json.numero_remito }}",
+            "Proveedor": "={{ $json.proveedor_nombre }}",
+            "Articulos": "={{ $json.categoria_productos_resumen }}",
+            "Cantidad": "={{ $json.cantidad_total_articulos }}",
+            "Factura": "={{ $json.numero_factura_asociada }}",
+            "Fecha de remito": "={{ $json.fecha_remito }}",
+            "Fecha de recepción \n(Deposito Bs As)": "={{ $json.fecha_recepcion_transporte }}",
+            "Responsable de Compra": "={{ $json.Comprador_Asignado }}"
+          },
+          "matchingColumns": [
+            "Nº de Remito del  Proveedor"
+          ],
+          "schema": [
+            {
+              "id": "Nº",
+              "displayName": "Nº",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nº de Remito del  Proveedor",
+              "displayName": "Nº de Remito del  Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Proveedor",
+              "displayName": "Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Articulos",
+              "displayName": "Articulos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cantidad",
+              "displayName": "Cantidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Orden de Compra",
+              "displayName": "Orden de Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Responsable de Compra",
+              "displayName": "Responsable de Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Factura",
+              "displayName": "Factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimiento FC",
+              "displayName": "Vencimiento FC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nº de Guia",
+              "displayName": "Nº de Guia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fecha de remito",
+              "displayName": "Fecha de remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de recepción \n(Deposito Bs As)",
+              "displayName": "Fecha de recepción \n(Deposito Bs As)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de Recepción (Col)",
+              "displayName": "Fecha de Recepción (Col)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "PEDIDO",
+              "displayName": "PEDIDO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Carga Declarada",
+              "displayName": "Carga Declarada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fecha de Informe",
+              "displayName": "Fecha de Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nº de informe ",
+              "displayName": "Nº de informe ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Ingreso cerrado",
+              "displayName": "Ingreso cerrado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Recepción COL",
+              "displayName": "Recepción COL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Días entre Rto Proveedor y Recpción Depósito Bs As)",
+              "displayName": "Días entre Rto Proveedor y Recpción Depósito Bs As)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Dias desde recepción en deposito  Bs As",
+              "displayName": "Dias desde recepción en deposito  Bs As",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Dias entre repeción  en dep Bs As y COL",
+              "displayName": "Dias entre repeción  en dep Bs As y COL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Dias desde recepción sin informe realizado",
+              "displayName": "Dias desde recepción sin informe realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Dias entre Recepción e Informe",
+              "displayName": "Dias entre Recepción e Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Vencimiento de Factura",
+              "displayName": "Vencimiento de Factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Prioridad",
+              "displayName": "Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - PRIORIDAD",
+              "displayName": "ID - PRIORIDAD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Orden Prioridad",
+              "displayName": "Orden Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID-OC",
+              "displayName": "ID-OC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - SIN RECEPCIÓN",
+              "displayName": "ID - SIN RECEPCIÓN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - Sin Informe",
+              "displayName": "ID - Sin Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - PRIORIDAD SEVILLANITA",
+              "displayName": "ID - PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - NUM PRIORIDAD SEVILLANITA",
+              "displayName": "ID - NUM PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ORDEN PRIORIDAD SEVILLANITA",
+              "displayName": "ORDEN PRIORIDAD SEVILLANITA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - PRIORIDAD Infome",
+              "displayName": "ID - PRIORIDAD Infome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - Num Prioridad Informe",
+              "displayName": "ID - Num Prioridad Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Orden Prioridad Informe",
+              "displayName": "Orden Prioridad Informe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Días desde Vencimiento",
+              "displayName": "Días desde Vencimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ID - FECHA VTO",
+              "displayName": "ID - FECHA VTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "FLAG_MAIL2_Enviado",
+              "displayName": "FLAG_MAIL2_Enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Link - Drive",
+              "displayName": "Link - Drive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        -832
+      ],
+      "id": "662f6dd9-2d44-4eb8-9323-aec48a6405a7",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0",
+          "mode": "list",
+          "cachedResultName": "EvolutionAPI_GrupoSevillanita",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "RAW_WSP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbBSJXxyI19l6j9xiuGFlLmXkoDHMZ1S4mdNnGPdGL0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "Exportado",
+            "numero_remito": "={{ $json['Nº de Remito del  Proveedor'] }}"
+          },
+          "matchingColumns": [
+            "numero_remito"
+          ],
+          "schema": [
+            {
+              "id": "grupo_id",
+              "displayName": "grupo_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje_id",
+              "displayName": "mensaje_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje_texto",
+              "displayName": "mensaje_texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numero_comprador",
+              "displayName": "numero_comprador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_evento",
+              "displayName": "fecha_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_mensaje",
+              "displayName": "tipo_mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reply_to",
+              "displayName": "reply_to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "media_id",
+              "displayName": "media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "buyer_id",
+              "displayName": "buyer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "procesado",
+              "displayName": "procesado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "grupo_logico",
+              "displayName": "grupo_logico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image_mimetype",
+              "displayName": "image_mimetype",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image_caption",
+              "displayName": "image_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "image_thumbnail_bytes",
+              "displayName": "image_thumbnail_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "proveedor_nombre",
+              "displayName": "proveedor_nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numero_remito",
+              "displayName": "numero_remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha_remito",
+              "displayName": "fecha_remito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numero_factura_asociada",
+              "displayName": "numero_factura_asociada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_recepcion_transporte",
+              "displayName": "fecha_recepcion_transporte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoria_productos_resumen",
+              "displayName": "categoria_productos_resumen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cantidad_total_articulos",
+              "displayName": "cantidad_total_articulos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "destino_logistico",
+              "displayName": "destino_logistico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Comprador_Asignado",
+              "displayName": "Comprador_Asignado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nivel_confianza",
+              "displayName": "Nivel_confianza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Justificacion_LLM",
+              "displayName": "Justificacion_LLM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha_analisis",
+              "displayName": "Fecha_analisis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        -832
+      ],
+      "id": "56d640b0-6114-4017-bc70-b346c299c57d",
+      "name": "Flag_final",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NL2qufCIMWXqZP8U",
+          "name": "Encargado_COL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "84edc0a8-899f-48aa-bae0-d21688217fed",
+              "leftValue": "={{ $json.destino }}",
+              "rightValue": "TUC",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2544,
+        -1072
+      ],
+      "id": "44242e3a-6c4c-4684-b04c-acf108b78741",
+      "name": "Selector_destino"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Informe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informe": {
+      "main": [
+        [
+          {
+            "node": "Error de carga",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sin comprador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error de carga": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sin_ERROR_DE_CARGA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin comprador": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Sin_ERROR_COMPRADOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTML_CORREO_INGRESOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Recepcion_COL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recepcion_COL": {
+      "main": [
+        [
+          {
+            "node": "Con_OC",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Entransito_SINOC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Con_OC": {
+      "main": [
+        [
+          {
+            "node": "Con_Informe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Grup_RECEPCOL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Con_Informe": {
+      "main": [
+        [
+          {
+            "node": "FiltroMail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CodeMailINg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grup_RECEPCOL": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Entransito_SINOC": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Group_Comprador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group_Comprador": {
+      "main": [
+        [
+          {
+            "node": "HTML_MAIL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CodeMailINg": {
+      "main": [
+        [
+          {
+            "node": "Mensaje_IngresoOC_COL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FiltroMail": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_MAIL": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filas_para_Actualizar": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_CORREO_INGRESOS": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Filas_para_Actualizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07am_Ing_Correccion_Tabla": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09AM_COMPRAS": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta_compradores": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Limpieza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpieza": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Transf_JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transf_JSON": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Buscar_filas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar_filas": {
+      "main": [
+        [
+          {
+            "node": "Actualizacion_de_datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizacion_de_datos": {
+      "main": [
+        [
+          {
+            "node": "Move a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Mensaje_Ingresos_Corrección",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin_ERROR_COMPRADOR": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin_ERROR_DE_CARGA": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Evaluacion de errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluacion de errores": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "HTML CORREO OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML CORREO OK": {
+      "main": [
+        [
+          {
+            "node": "Mail_OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filtro_Grupo_Compras",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro_Grupo_Compras": {
+      "main": [
+        [
+          {
+            "node": "SET_ALMACENAMIENTO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SET_ALMACENAMIENTO": {
+      "main": [
+        [
+          {
+            "node": "Colector_INFO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "LECTURA_INFO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LECTURA_INFO": {
+      "main": [
+        [
+          {
+            "node": "Grupo_Logico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grupo_Logico": {
+      "main": [
+        [
+          {
+            "node": "Escribir_GrupoLogico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir_GrupoLogico": {
+      "main": [
+        [
+          {
+            "node": "Filtro_Img",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro_Img": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Actulizacion_Destino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "MergeCode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MergeCode": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge_Info_Completa",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Normal_Campos_Remitos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normal_Campos_Remitos": {
+      "main": [
+        [
+          {
+            "node": "Merge_Info_Completa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge_Info_Completa": {
+      "main": [
+        [
+          {
+            "node": "Actualizacion_Rto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizacion_Rto": {
+      "main": [
+        [
+          {
+            "node": "Leer_Contexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer_Contexto": {
+      "main": [
+        [
+          {
+            "node": "Code_Conversacion_LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Análisis_destino": {
+      "main": [
+        [
+          {
+            "node": "Code_Normalizacion_LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_Conversacion_LLM": {
+      "main": [
+        [
+          {
+            "node": "Análisis_destino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_Normalizacion_LLM": {
+      "main": [
+        [
+          {
+            "node": "Selector_destino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actulizacion_Destino": {
+      "main": [
+        [
+          {
+            "node": "Datos_para_exportar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos_para_exportar": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Flag_final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Selector_destino": {
+      "main": [
+        [
+          {
+            "node": "Actulizacion_Destino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "ebf06c14-40ad-4b49-968e-4be97bb3ff53",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "658034c0c9a535d413a60f767dc76131e5c1ab83b5e12c7fe397cf8d7618fd28"
+  },
+  "id": "Ue426jhAzNsH6V5r",
+  "tags": []
+}
