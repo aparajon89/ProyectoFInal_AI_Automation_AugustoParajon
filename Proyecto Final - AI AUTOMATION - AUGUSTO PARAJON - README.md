@@ -4,7 +4,7 @@
 
 Diseñar e implementar un workflow automático en n8n que procese mensajes operativos provenientes de un grupo de WhatsApp vinculado a la logística de una empresa de retail, interprete información estructurada y no estructurada mediante modelos de lenguaje (LLMs), tome decisiones condicionales basadas en esas salidas y consolide los resultados en una base de datos utilizada como fuente para dashboards operativos.
 
-El objetivo principal es automatizar la captura, interpretación y validación de información logística crítica (remitos, destinos, estados e inconsistencias), reducir la intervención manual y generar alertas y reportes accionables para los sectores de Compras e Ingresos Logísticos
+El objetivo principal es automatizar la captura, interpretación y validación de información logística crítica (remitos, destinos, estados e inconsistencias), reducir la intervención manual y generar alertas y reportes accionables para los sectores de Compras e Ingresos Logísticos.
 
 ---
 
@@ -132,8 +132,6 @@ La importación y ejecución completa del flujo requieren la configuración de c
 En ausencia de estas credenciales, el workflow puede ser importado y revisado a nivel de arquitectura, lógica condicional y orquestación de nodos, mientras que el funcionamiento end-to-end se valida mediante la evidencia visual de ejecuciones reales incluida en la entrega.
 
 ---
-
-## 12. Limitaciones y acciones ante las limitaciones
 
 ## 12. Limitaciones y acciones ante las limitaciones
 
