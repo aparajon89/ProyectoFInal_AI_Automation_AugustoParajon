@@ -14,7 +14,7 @@ El sistema se apoya en un flujo automático compuesto por varias ramas funcional
 
 A partir de esa base, distintos procesos programados analizan imágenes y textos, extraen información relevante utilizando LLMs, aplican lógica condicional para clasificar y validar los datos, y actualizan la tabla que sirve como insumo para dashboards operativos y reportes diarios.
 
-Este proyecto reemplaza el ejemplo académico de análisis de tweets por un caso real de mensajería logística, manteniendo la misma arquitectura exigida por la consigna: trigger automático, clasificación con LLM, decisión condicional y notificación.
+La arquitectura del flujo está diseñada para demostrar la orquestación de modelos de lenguaje dentro de un proceso automático, combinando triggers reales, clasificación mediante LLMs, decisiones condicionales y notificaciones, aplicadas a un escenario operativo concreto.
 
 ---
 
