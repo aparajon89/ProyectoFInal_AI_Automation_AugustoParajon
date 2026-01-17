@@ -117,25 +117,33 @@ En estos casos, el flujo registra el error y notifica a los responsables corresp
 
 ## 10. Ejecución, pruebas y limitaciones de acceso
 
-El workflow integra servicios externos (WhatsApp, correo electrónico y hojas de cálculo) que requieren credenciales y accesos específicos de la organización. Por este motivo, el evaluador no podrá ejecutar pruebas de campo completas sin replicar dicho entorno.
+El workflow integra múltiples servicios externos, como WhatsApp, correo electrónico y hojas de cálculo, que requieren credenciales válidas y permisos específicos asociados a cuentas reales. Debido a esta dependencia, no es posible ejecutar el proceso completo en un entorno externo sin replicar dichas configuraciones y accesos.
 
-Esta limitación es inherente al tipo de integración implementada y no afecta la validez técnica del proyecto. Para compensar esta restricción, se incluye evidencia visual de ejecuciones reales del flujo, donde se observa el funcionamiento end-to-end del sistema: inputs recibidos, salidas de los LLMs, decisiones condicionales, notificaciones enviadas y actualización de la base de datos.
+Por este motivo, la ejecución del flujo queda condicionada a la disponibilidad de credenciales y permisos adecuados. Como alternativa, se incorpora evidencia visual de ejecuciones reales que permite observar el funcionamiento del workflow, las decisiones condicionales y los resultados generados, sin necesidad de acceso directo a los servicios integrados.
 
 ---
 
 ## 11. Importación y configuración
 
-1. Importar el archivo `workflow.json` en n8n.
-2. Configurar las credenciales necesarias (Google Sheets, correo electrónico, webhook).
-3. Definir las variables de entorno indicadas en la documentación.
-4. Activar el workflow.
+El workflow se entrega exportado desde n8n en formato `workflow.json`, con el objetivo de permitir su inspección, análisis y comprensión estructural por parte del evaluador.
 
-No se incluyen credenciales reales en los archivos entregados.
+La importación y ejecución completa del flujo requieren la configuración de credenciales reales para los servicios externos integrados (Google Sheets, correo electrónico, WhatsApp vía webhook). Dichas credenciales no se incluyen en el proyecto por razones de seguridad y porque están asociadas a cuentas y entornos operativos específicos.
+
+En ausencia de estas credenciales, el workflow puede ser importado y revisado a nivel de arquitectura, lógica condicional y orquestación de nodos, mientras que el funcionamiento end-to-end se valida mediante la evidencia visual de ejecuciones reales incluida en la entrega.
 
 ---
 
-## 12. Limitaciones conocidas
+## 12. Limitaciones y acciones ante las limitaciones
 
-- La interpretación de imágenes depende de la calidad de los remitos enviados.
-- Los LLMs pueden presentar sesgos o errores ante información ambigua.
-- El flujo está diseñado para un contexto operativo específico y puede requerir ajustes para otros entornos.
+## 12. Limitaciones y acciones ante las limitaciones
+
+El proyecto presenta limitaciones inherentes al uso de modelos de lenguaje y a la integración con fuentes externas. La interpretación de imágenes y mensajes depende de la calidad del material recibido y del contexto disponible en cada conversación, lo que puede derivar en ambigüedades o información incompleta.
+
+Ante estas situaciones, el workflow aplica criterios operativos concretos:
+- Normalización de las salidas de los LLMs antes de su uso en decisiones condicionales.
+- Identificación de registros que no pueden resolverse automáticamente.
+- Derivación de esos casos a instancias de revisión mediante notificaciones y reportes.
+- Separación explícita entre información completada automáticamente y datos que deben ser confirmados manualmente.
+
+De este modo, las limitaciones no se ocultan ni se fuerzan a resoluciones incorrectas, sino que quedan visibles dentro del flujo para su tratamiento posterior.
+
